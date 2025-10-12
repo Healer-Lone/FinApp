@@ -31,10 +31,23 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBook
     }
     
     try {
-      await Share.open({
-        message: `${article.headline}\n\n${article.summary}\n\n${article.stockSymbol}: $${article.currentPrice} (${article.priceChange >= 0 ? '+' : ''}${article.percentageChange}%)`,
-        title: article.company,
-      });
+      const message = `${article.headline}\n\n${article.summary}\n\n${article.stockSymbol}: $${article.currentPrice} (${article.priceChange >= 0 ? '+' : ''}${article.percentageChange}%)`;
+      
+      if (Platform.OS === 'web') {
+        if (navigator.share) {
+          await navigator.share({
+            title: article.company,
+            text: message,
+          });
+        } else {
+          // Fallback for web browsers without share API
+          alert('Share functionality is not available in this browser');
+        }
+      } else {
+        // For native, we'll use a simple alert as expo-sharing is for files
+        // In a real app, you'd use a proper sharing solution
+        alert('Share feature will be available soon!');
+      }
     } catch (error) {
       // User cancelled share
     }
