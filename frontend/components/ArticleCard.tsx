@@ -10,7 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { formatDistanceToNow } from 'date-fns';
 import { Article } from '../types/article';
-import Share from 'react-native-share';
+import * as Sharing from 'expo-sharing';
 import * as Haptics from 'expo-haptics';
 
 const { width, height } = Dimensions.get('window');
