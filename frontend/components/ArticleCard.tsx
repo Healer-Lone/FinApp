@@ -10,8 +10,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { formatDistanceToNow } from 'date-fns';
 import { Article } from '../types/article';
-import * as Sharing from 'expo-sharing';
 import * as Haptics from 'expo-haptics';
+import { useTheme } from '../contexts/ThemeContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -22,7 +22,8 @@ interface ArticleCardProps {
 }
 
 const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBookmarkToggle }) => {
-  const priceChangeColor = article.priceChange >= 0 ? '#4caf50' : '#f44336';
+  const { colors } = useTheme();
+  const priceChangeColor = article.priceChange >= 0 ? colors.success : colors.error;
   const priceChangeIcon = article.priceChange >= 0 ? 'trending-up' : 'trending-down';
 
   const handleShare = async () => {
@@ -40,12 +41,9 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBook
             text: message,
           });
         } else {
-          // Fallback for web browsers without share API
           alert('Share functionality is not available in this browser');
         }
       } else {
-        // For native, we'll use a simple alert as expo-sharing is for files
-        // In a real app, you'd use a proper sharing solution
         alert('Share feature will be available soon!');
       }
     } catch (error) {
@@ -61,78 +59,69 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBook
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Floating Action Buttons */}
+      <View style={styles.floatingActions}>
+        <TouchableOpacity 
+          style={[styles.floatingButton, { backgroundColor: colors.card }]} 
+          onPress={handleBookmark}
+        >
+          <Ionicons
+            name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
+            size={20}
+            color={isBookmarked ? colors.accent : colors.text}
+          />
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[styles.floatingButton, { backgroundColor: colors.card }]} 
+          onPress={handleShare}
+        >
+          <Ionicons name="share-social-outline" size={20} color={colors.text} />
+        </TouchableOpacity>
+      </View>
+
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.companyInfo}>
-          <View style={styles.companyIcon}>
+          <View style={[styles.companyIcon, { backgroundColor: colors.primary }]}>
             <Text style={styles.companyInitial}>{article.company.charAt(0)}</Text>
           </View>
           <View style={styles.companyDetails}>
-            <Text style={styles.companyName}>{article.company}</Text>
-            <Text style={styles.timestamp}>
+            <Text style={[styles.companyName, { color: colors.text }]}>{article.company}</Text>
+            <Text style={[styles.timestamp, { color: colors.textSecondary }]}>
               {formatDistanceToNow(article.timestamp, { addSuffix: true })}
             </Text>
           </View>
         </View>
-        <View style={styles.stockInfo}>
-          <View style={[styles.priceChange, { backgroundColor: priceChangeColor + '20' }]}>
-            <Ionicons name={priceChangeIcon} size={16} color={priceChangeColor} />
-            <Text style={[styles.percentageChange, { color: priceChangeColor }]}>
-              {article.priceChange >= 0 ? '+' : ''}{article.percentageChange.toFixed(2)}%
-            </Text>
-          </View>
+        <View style={[styles.priceChange, { backgroundColor: priceChangeColor + '20' }]}>
+          <Ionicons name={priceChangeIcon} size={14} color={priceChangeColor} />
+          <Text style={[styles.percentageChange, { color: priceChangeColor }]}>
+            {article.priceChange >= 0 ? '+' : ''}{article.percentageChange.toFixed(2)}%
+          </Text>
         </View>
       </View>
 
       {/* Stock Price Banner */}
-      <View style={styles.stockBanner}>
-        <Text style={styles.stockSymbol}>{article.stockSymbol}</Text>
-        <View style={styles.priceDivider} />
-        <Text style={styles.stockPrice}>${article.currentPrice.toFixed(2)}</Text>
-        <View style={styles.priceDivider} />
-        <View style={styles.sectorTag}>
+      <View style={[styles.stockBanner, { backgroundColor: colors.cardBg }]}>
+        <Text style={[styles.stockSymbol, { color: colors.primary }]}>{article.stockSymbol}</Text>
+        <View style={[styles.priceDivider, { backgroundColor: colors.border }]} />
+        <Text style={[styles.stockPrice, { color: colors.text }]}>${article.currentPrice.toFixed(2)}</Text>
+        <View style={[styles.priceDivider, { backgroundColor: colors.border }]} />
+        <View style={[styles.sectorTag, { backgroundColor: colors.accent }]}>
           <Text style={styles.sectorText}>{article.sector}</Text>
         </View>
       </View>
 
       {/* Content */}
       <View style={styles.content}>
-        <Text style={styles.headline}>{article.headline}</Text>
-        <Text style={styles.summary}>{article.summary}</Text>
-      </View>
-
-      {/* Action Buttons */}
-      <View style={styles.actions}>
-        <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-          <Ionicons name="share-social-outline" size={24} color="#1a237e" />
-          <Text style={styles.actionText}>Share</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.actionButton, isBookmarked && styles.bookmarkedButton]}
-          onPress={handleBookmark}
-        >
-          <Ionicons
-            name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
-            size={24}
-            color={isBookmarked ? '#00bfa5' : '#1a237e'}
-          />
-          <Text style={[styles.actionText, isBookmarked && styles.bookmarkedText]}>
-            {isBookmarked ? 'Saved' : 'Save'}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.actionButton}>
-          <Ionicons name="open-outline" size={24} color="#1a237e" />
-          <Text style={styles.actionText}>Read More</Text>
-        </TouchableOpacity>
+        <Text style={[styles.headline, { color: colors.text }]}>{article.headline}</Text>
+        <Text style={[styles.summary, { color: colors.textSecondary }]}>{article.summary}</Text>
       </View>
 
       {/* Swipe Indicator */}
       <View style={styles.swipeIndicator}>
-        <Ionicons name="chevron-down" size={20} color="#9e9e9e" />
-        <Text style={styles.swipeText}>Swipe for next article</Text>
+        <Ionicons name="chevron-down" size={16} color={colors.textSecondary} />
       </View>
     </View>
   );
@@ -141,16 +130,35 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBook
 const styles = StyleSheet.create({
   container: {
     width: width,
-    height: height - (Platform.OS === 'ios' ? 150 : 130),
-    backgroundColor: '#ffffff',
+    height: height - (Platform.OS === 'ios' ? 105 : 85),
     padding: 20,
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingTop: Platform.OS === 'ios' ? 50 : 30,
+  },
+  floatingActions: {
+    position: 'absolute',
+    right: 16,
+    top: Platform.OS === 'ios' ? 55 : 35,
+    zIndex: 10,
+    gap: 8,
+  },
+  floatingButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
+    paddingRight: 50,
   },
   companyInfo: {
     flexDirection: 'row',
@@ -158,80 +166,69 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   companyIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#1a237e',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   companyInitial: {
     color: '#ffffff',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   companyDetails: {
     flex: 1,
   },
   companyName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
-    color: '#212121',
     marginBottom: 2,
   },
   timestamp: {
-    fontSize: 12,
-    color: '#757575',
-  },
-  stockInfo: {
-    alignItems: 'flex-end',
+    fontSize: 11,
   },
   priceChange: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 3,
   },
   percentageChange: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '700',
   },
   stockBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: 14,
-    borderRadius: 12,
+    padding: 12,
+    borderRadius: 10,
     marginBottom: 20,
-    gap: 12,
+    gap: 10,
   },
   stockSymbol: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '800',
-    color: '#1a237e',
     letterSpacing: 0.5,
   },
   stockPrice: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
-    color: '#212121',
   },
   priceDivider: {
     width: 1,
-    height: 20,
-    backgroundColor: '#e0e0e0',
+    height: 16,
   },
   sectorTag: {
-    backgroundColor: '#00bfa5',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 10,
   },
   sectorText: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
     color: '#ffffff',
     textTransform: 'uppercase',
@@ -241,53 +238,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headline: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '800',
-    color: '#212121',
-    lineHeight: 30,
-    marginBottom: 16,
+    lineHeight: 28,
+    marginBottom: 14,
   },
   summary: {
     fontSize: 15,
     lineHeight: 24,
-    color: '#424242',
     textAlign: 'justify',
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    marginTop: 16,
-  },
-  actionButton: {
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    minWidth: 80,
-  },
-  bookmarkedButton: {
-    backgroundColor: '#00bfa5' + '15',
-  },
-  actionText: {
-    marginTop: 4,
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#1a237e',
-  },
-  bookmarkedText: {
-    color: '#00bfa5',
   },
   swipeIndicator: {
     alignItems: 'center',
     paddingBottom: 8,
-  },
-  swipeText: {
-    fontSize: 11,
-    color: '#9e9e9e',
-    marginTop: 2,
   },
 });
 
