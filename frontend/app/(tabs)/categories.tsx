@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,15 +7,19 @@ import {
   StyleSheet,
   StatusBar,
   Platform,
-  SafeAreaView,
   FlatList,
+  BackHandler,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Category } from '../../types/article';
-import { getArticlesByCategory } from '../../utils/mockData';
+import { getArticlesByCategory, mockArticles } from '../../utils/mockData';
 import ArticleCard from '../../components/ArticleCard';
 import { useBookmarks } from '../../contexts/BookmarkContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import * as Haptics from 'expo-haptics';
+
+const { height } = Dimensions.get('window');
 
 const categories: Category[] = [
   'All',
@@ -41,6 +45,19 @@ export default function CategoriesScreen() {
   const [selectedCategory, setSelectedCategory] = useState<Category>('All');
   const [showArticles, setShowArticles] = useState(false);
   const { addBookmark, removeBookmark, isBookmarked } = useBookmarks();
+  const { colors, isDarkMode } = useTheme();
+
+  // Handle Android back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (showArticles) {
+        setShowArticles(false);
+        return true;
+      }
+      return false;
+    });
+    return () => backHandler.remove();
+  }, [showArticles]);
 
   const handleCategorySelect = async (category: Category) => {
     if (Platform.OS !== 'web') {
@@ -69,20 +86,22 @@ export default function CategoriesScreen() {
 
   if (showArticles) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <StatusBar 
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'} 
+          backgroundColor={colors.background} 
+        />
         
-        {/* Header with Back Button */}
-        <View style={styles.headerContainer}>
+        <View style={[styles.articleHeader, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
           <TouchableOpacity
-            style={styles.backButton}
+            style={[styles.backButton, { backgroundColor: colors.cardBg }]}
             onPress={handleBackToCategories}
           >
-            <Ionicons name="arrow-back" size={24} color="#1a237e" />
+            <Ionicons name="arrow-back" size={20} color={colors.text} />
           </TouchableOpacity>
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>{selectedCategory}</Text>
-            <Text style={styles.headerSubtitle}>
+            <Text style={[styles.articleHeaderTitle, { color: colors.text }]}>{selectedCategory}</Text>
+            <Text style={[styles.articleHeaderSubtitle, { color: colors.textSecondary }]}>
               {filteredArticles.length} articles
             </Text>
           </View>
@@ -102,21 +121,18 @@ export default function CategoriesScreen() {
           showsVerticalScrollIndicator={false}
           decelerationRate="fast"
           snapToAlignment="start"
-          snapToInterval={Platform.OS === 'ios' ? undefined : 700}
+          snapToInterval={height - (Platform.OS === 'ios' ? 160 : 140)}
         />
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      
-      {/* Header */}
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerTitle}>Categories</Text>
-        <Text style={styles.headerSubtitle}>Browse by sector</Text>
-      </View>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar 
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'} 
+        backgroundColor={colors.background} 
+      />
 
       <ScrollView
         style={styles.scrollView}
@@ -129,152 +145,135 @@ export default function CategoriesScreen() {
             return (
               <TouchableOpacity
                 key={category}
-                style={styles.categoryCard}
+                style={[styles.categoryCard, { backgroundColor: colors.cardBg }]}
                 onPress={() => handleCategorySelect(category)}
                 activeOpacity={0.7}
               >
-                <View style={styles.categoryIconContainer}>
+                <View style={[styles.categoryIconContainer, { backgroundColor: colors.background }]}>
                   <Ionicons
                     name={categoryIcons[category] as any}
-                    size={32}
-                    color="#1a237e"
+                    size={28}
+                    color={colors.primary}
                   />
                 </View>
-                <Text style={styles.categoryName}>{category}</Text>
-                <Text style={styles.categoryCount}>
+                <Text style={[styles.categoryName, { color: colors.text }]}>{category}</Text>
+                <Text style={[styles.categoryCount, { color: colors.textSecondary }]}>
                   {articleCount} {articleCount === 1 ? 'article' : 'articles'}
                 </Text>
                 <View style={styles.categoryArrow}>
-                  <Ionicons name="chevron-forward" size={20} color="#00bfa5" />
+                  <Ionicons name="chevron-forward" size={18} color={colors.accent} />
                 </View>
               </TouchableOpacity>
             );
           })}
         </View>
 
-        {/* Stats Section */}
         <View style={styles.statsSection}>
-          <Text style={styles.statsTitle}>Quick Stats</Text>
+          <Text style={[styles.statsTitle, { color: colors.text }]}>Market Overview</Text>
           <View style={styles.statsGrid}>
-            <View style={styles.statCard}>
-              <Ionicons name="newspaper" size={28} color="#00bfa5" />
-              <Text style={styles.statNumber}>{mockArticles.length}</Text>
-              <Text style={styles.statLabel}>Total Articles</Text>
+            <View style={[styles.statCard, { backgroundColor: colors.cardBg }]}>
+              <Ionicons name="newspaper" size={24} color={colors.accent} />
+              <Text style={[styles.statNumber, { color: colors.text }]}>{mockArticles.length}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Articles</Text>
             </View>
-            <View style={styles.statCard}>
-              <Ionicons name="pulse" size={28} color="#4caf50" />
-              <Text style={styles.statNumber}>
+            <View style={[styles.statCard, { backgroundColor: colors.cardBg }]}>
+              <Ionicons name="trending-up" size={24} color={colors.success} />
+              <Text style={[styles.statNumber, { color: colors.text }]}>
                 {mockArticles.filter((a) => a.priceChange > 0).length}
               </Text>
-              <Text style={styles.statLabel}>Bullish</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Bullish</Text>
             </View>
-            <View style={styles.statCard}>
-              <Ionicons name="trending-down" size={28} color="#f44336" />
-              <Text style={styles.statNumber}>
+            <View style={[styles.statCard, { backgroundColor: colors.cardBg }]}>
+              <Ionicons name="trending-down" size={24} color={colors.error} />
+              <Text style={[styles.statNumber, { color: colors.text }]}>
                 {mockArticles.filter((a) => a.priceChange < 0).length}
               </Text>
-              <Text style={styles.statLabel}>Bearish</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Bearish</Text>
             </View>
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    paddingTop: Platform.OS === 'ios' ? 50 : 30,
   },
-  headerContainer: {
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'ios' ? 8 : 16,
-    paddingBottom: 12,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+  articleHeader: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
+    borderBottomWidth: 1,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f5f5f5',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
   headerTextContainer: {
     flex: 1,
   },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: '#1a237e',
-    letterSpacing: -0.5,
+  articleHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '800',
   },
-  headerSubtitle: {
-    fontSize: 13,
-    color: '#757575',
+  articleHeaderSubtitle: {
+    fontSize: 12,
     marginTop: 2,
-    fontWeight: '500',
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
+    padding: 16,
   },
   categoryGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   categoryCard: {
     width: '48%',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  categoryIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#ffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: 14,
+    padding: 16,
     marginBottom: 12,
   },
+  categoryIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   categoryName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
-    color: '#212121',
-    marginBottom: 4,
+    marginBottom: 3,
   },
   categoryCount: {
-    fontSize: 13,
-    color: '#757575',
-    marginBottom: 8,
+    fontSize: 12,
   },
   categoryArrow: {
     position: 'absolute',
-    top: 16,
-    right: 16,
+    top: 12,
+    right: 12,
   },
   statsSection: {
     marginTop: 8,
   },
   statsTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#212121',
-    marginBottom: 16,
+    marginBottom: 14,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -282,24 +281,19 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     borderRadius: 12,
-    padding: 16,
+    padding: 14,
     alignItems: 'center',
-    marginHorizontal: 4,
+    marginHorizontal: 3,
   },
   statNumber: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '800',
-    color: '#212121',
-    marginTop: 8,
-    marginBottom: 4,
+    marginTop: 6,
+    marginBottom: 3,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#757575',
+    fontSize: 11,
     fontWeight: '600',
   },
 });
-
-import { mockArticles } from '../../utils/mockData';
