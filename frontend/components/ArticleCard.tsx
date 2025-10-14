@@ -334,10 +334,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     textAlign: 'justify',
   },
-  swipeIndicator: {
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
 });
 
 export default ArticleCard;
