@@ -170,8 +170,8 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBook
 
         {/* Headline & Summary */}
         <View style={styles.textContent}>
-          <Text style={[styles.headline, { color: colors.text }]}>{article.headline}</Text>
-          <Text style={[styles.summary, { color: colors.textSecondary }]}>{article.summary}</Text>
+          <Text style={[styles.headline, { color: colors.text }]} numberOfLines={3}>{article.headline}</Text>
+          <Text style={[styles.summary, { color: colors.textSecondary }]} numberOfLines={8}>{article.summary}</Text>
         </View>
       </View>
     </View>
