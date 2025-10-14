@@ -9,7 +9,8 @@ export interface Article {
   percentageChange: number;
   sector: string;
   timestamp: Date;
-  imageUrl?: string;
+  imageUrl: string;
+  imageColor: string;
 }
 
 export type Category = 'All' | 'Technology' | 'Banking' | 'Energy' | 'Healthcare' | 'Consumer' | 'Manufacturing';

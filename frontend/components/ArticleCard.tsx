@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,14 +6,15 @@ import {
   Dimensions,
   TouchableOpacity,
   Platform,
+  Modal,
+  Image,
+  useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { formatDistanceToNow } from 'date-fns';
 import { Article } from '../types/article';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../contexts/ThemeContext';
-
-const { width, height } = Dimensions.get('window');
 
 interface ArticleCardProps {
   article: Article;
@@ -23,10 +24,18 @@ interface ArticleCardProps {
 
 const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBookmarkToggle }) => {
   const { colors } = useTheme();
+  const [showMenu, setShowMenu] = useState(false);
+  const { width, height } = useWindowDimensions();
+  
   const priceChangeColor = article.priceChange >= 0 ? colors.success : colors.error;
   const priceChangeIcon = article.priceChange >= 0 ? 'trending-up' : 'trending-down';
 
+  // Responsive height calculation
+  const cardHeight = height - (Platform.OS === 'ios' ? 105 : 85);
+  const imageHeight = Math.min(height * 0.28, 240); // 28% of screen or max 240px
+
   const handleShare = async () => {
+    setShowMenu(false);
     if (Platform.OS !== 'web') {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
@@ -52,76 +61,123 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBook
   };
 
   const handleBookmark = async () => {
+    setShowMenu(false);
     if (Platform.OS !== 'web') {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
     onBookmarkToggle();
   };
 
-  return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Floating Action Buttons */}
-      <View style={styles.floatingActions}>
-        <TouchableOpacity 
-          style={[styles.floatingButton, { backgroundColor: colors.card }]} 
-          onPress={handleBookmark}
-        >
-          <Ionicons
-            name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
-            size={20}
-            color={isBookmarked ? colors.accent : colors.text}
-          />
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={[styles.floatingButton, { backgroundColor: colors.card }]} 
-          onPress={handleShare}
-        >
-          <Ionicons name="share-social-outline" size={20} color={colors.text} />
-        </TouchableOpacity>
-      </View>
+  const toggleMenu = async () => {
+    if (Platform.OS !== 'web') {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    setShowMenu(!showMenu);
+  };
 
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.companyInfo}>
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background, height: cardHeight, width }]}>
+      {/* Header Image */}
+      <View style={[styles.imageContainer, { height: imageHeight }]}>
+        <Image
+          source={{ uri: article.imageUrl }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+        <View style={styles.imageOverlay} />
+        
+        {/* 3-dot menu on image */}
+        <TouchableOpacity 
+          style={[styles.menuButton, { backgroundColor: 'rgba(0,0,0,0.5)' }]} 
+          onPress={toggleMenu}
+        >
+          <Ionicons name="ellipsis-horizontal" size={20} color="#ffffff" />
+        </TouchableOpacity>
+
+        {/* Company badge on image */}
+        <View style={[styles.companyBadge, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
           <View style={[styles.companyIcon, { backgroundColor: colors.primary }]}>
             <Text style={styles.companyInitial}>{article.company.charAt(0)}</Text>
           </View>
-          <View style={styles.companyDetails}>
-            <Text style={[styles.companyName, { color: colors.text }]}>{article.company}</Text>
-            <Text style={[styles.timestamp, { color: colors.textSecondary }]}>
-              {formatDistanceToNow(article.timestamp, { addSuffix: true })}
-            </Text>
-          </View>
+          <Text style={styles.companyNameOnImage}>{article.company}</Text>
         </View>
-        <View style={[styles.priceChange, { backgroundColor: priceChangeColor + '20' }]}>
-          <Ionicons name={priceChangeIcon} size={14} color={priceChangeColor} />
-          <Text style={[styles.percentageChange, { color: priceChangeColor }]}>
+
+        {/* Price indicator on image */}
+        <View style={[styles.priceIndicator, { backgroundColor: priceChangeColor + '20', borderColor: priceChangeColor }]}>
+          <Ionicons name={priceChangeIcon} size={16} color={priceChangeColor} />
+          <Text style={[styles.priceText, { color: priceChangeColor }]}>
             {article.priceChange >= 0 ? '+' : ''}{article.percentageChange.toFixed(2)}%
           </Text>
         </View>
       </View>
 
-      {/* Stock Price Banner */}
-      <View style={[styles.stockBanner, { backgroundColor: colors.cardBg }]}>
-        <Text style={[styles.stockSymbol, { color: colors.primary }]}>{article.stockSymbol}</Text>
-        <View style={[styles.priceDivider, { backgroundColor: colors.border }]} />
-        <Text style={[styles.stockPrice, { color: colors.text }]}>${article.currentPrice.toFixed(2)}</Text>
-        <View style={[styles.priceDivider, { backgroundColor: colors.border }]} />
-        <View style={[styles.sectorTag, { backgroundColor: colors.accent }]}>
-          <Text style={styles.sectorText}>{article.sector}</Text>
-        </View>
-      </View>
+      {/* Menu Modal */}
+      <Modal
+        visible={showMenu}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowMenu(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1} 
+          onPress={() => setShowMenu(false)}
+        >
+          <View style={[styles.menuContainer, { backgroundColor: colors.card }]}>
+            <TouchableOpacity 
+              style={styles.menuOption} 
+              onPress={handleBookmark}
+            >
+              <Ionicons 
+                name={isBookmarked ? 'bookmark' : 'bookmark-outline'} 
+                size={22} 
+                color={isBookmarked ? colors.accent : colors.text} 
+              />
+              <Text style={[styles.menuOptionText, { color: colors.text }]}>
+                {isBookmarked ? 'Remove Bookmark' : 'Save Article'}
+              </Text>
+            </TouchableOpacity>
+            
+            <View style={[styles.menuDivider, { backgroundColor: colors.border }]} />
+            
+            <TouchableOpacity 
+              style={styles.menuOption} 
+              onPress={handleShare}
+            >
+              <Ionicons name="share-social-outline" size={22} color={colors.text} />
+              <Text style={[styles.menuOptionText, { color: colors.text }]}>Share Article</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
 
       {/* Content */}
       <View style={styles.content}>
-        <Text style={[styles.headline, { color: colors.text }]}>{article.headline}</Text>
-        <Text style={[styles.summary, { color: colors.textSecondary }]}>{article.summary}</Text>
-      </View>
+        {/* Stock Info Banner */}
+        <View style={[styles.stockBanner, { backgroundColor: colors.cardBg }]}>
+          <Text style={[styles.stockSymbol, { color: colors.primary }]}>{article.stockSymbol}</Text>
+          <View style={[styles.priceDivider, { backgroundColor: colors.border }]} />
+          <Text style={[styles.stockPrice, { color: colors.text }]}>${article.currentPrice.toFixed(2)}</Text>
+          <View style={[styles.priceDivider, { backgroundColor: colors.border }]} />
+          <View style={[styles.sectorTag, { backgroundColor: colors.accent }]}>
+            <Text style={styles.sectorText}>{article.sector}</Text>
+          </View>
+          <View style={{ flex: 1 }} />
+          <Text style={[styles.timestamp, { color: colors.textSecondary }]}>
+            {formatDistanceToNow(article.timestamp, { addSuffix: true })}
+          </Text>
+        </View>
 
-      {/* Swipe Indicator */}
-      <View style={styles.swipeIndicator}>
-        <Ionicons name="chevron-down" size={16} color={colors.textSecondary} />
+        {/* Headline & Summary */}
+        <View style={styles.textContent}>
+          <Text style={[styles.headline, { color: colors.text }]}>{article.headline}</Text>
+          <Text style={[styles.summary, { color: colors.textSecondary }]}>{article.summary}</Text>
+        </View>
+
+        {/* Swipe Indicator */}
+        <View style={styles.swipeIndicator}>
+          <Ionicons name="chevron-down" size={16} color={colors.textSecondary} />
+        </View>
       </View>
     </View>
   );
@@ -129,100 +185,129 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBook
 
 const styles = StyleSheet.create({
   container: {
-    width: width,
-    height: height - (Platform.OS === 'ios' ? 105 : 85),
-    padding: 20,
-    paddingTop: Platform.OS === 'ios' ? 50 : 30,
+    overflow: 'hidden',
   },
-  floatingActions: {
+  imageContainer: {
+    width: '100%',
+    position: 'relative',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
+  imageOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+  },
+  menuButton: {
     position: 'absolute',
+    top: Platform.OS === 'ios' ? 50 : 35,
     right: 16,
-    top: Platform.OS === 'ios' ? 55 : 35,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
     zIndex: 10,
+  },
+  companyBadge: {
+    position: 'absolute',
+    bottom: 12,
+    left: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingRight: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
     gap: 8,
   },
-  floatingButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.05)',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-    paddingRight: 50,
-  },
-  companyInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
   companyIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
   },
   companyInitial: {
     color: '#ffffff',
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 'bold',
   },
-  companyDetails: {
-    flex: 1,
-  },
-  companyName: {
-    fontSize: 15,
+  companyNameOnImage: {
+    color: '#ffffff',
+    fontSize: 14,
     fontWeight: '700',
-    marginBottom: 2,
   },
-  timestamp: {
-    fontSize: 11,
-  },
-  priceChange: {
+  priceIndicator: {
+    position: 'absolute',
+    bottom: 12,
+    right: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 4,
+    borderWidth: 1.5,
   },
-  percentageChange: {
-    fontSize: 12,
+  priceText: {
+    fontSize: 13,
     fontWeight: '700',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  menuContainer: {
+    width: '80%',
+    maxWidth: 300,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  menuOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 18,
+    gap: 16,
+  },
+  menuOptionText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  menuDivider: {
+    height: 1,
+  },
+  content: {
+    flex: 1,
+    padding: 16,
   },
   stockBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
     borderRadius: 10,
-    marginBottom: 20,
+    marginBottom: 16,
     gap: 10,
   },
   stockSymbol: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '800',
     letterSpacing: 0.5,
   },
   stockPrice: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
   },
   priceDivider: {
     width: 1,
-    height: 16,
+    height: 14,
   },
   sectorTag: {
     paddingHorizontal: 10,
@@ -230,29 +315,33 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   sectorText: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '700',
     color: '#ffffff',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  content: {
+  timestamp: {
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  textContent: {
     flex: 1,
   },
   headline: {
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: '800',
-    lineHeight: 28,
-    marginBottom: 14,
+    lineHeight: 26,
+    marginBottom: 12,
   },
   summary: {
-    fontSize: 15,
-    lineHeight: 24,
+    fontSize: 14,
+    lineHeight: 22,
     textAlign: 'justify',
   },
   swipeIndicator: {
     alignItems: 'center',
-    paddingBottom: 8,
+    paddingVertical: 8,
   },
 });
 

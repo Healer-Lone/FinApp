@@ -9,6 +9,19 @@ const getRandomPrice = (base: number) => {
   return parseFloat((base + Math.random() * 50).toFixed(2));
 };
 
+const companyImages = [
+  { color: '#007AFF', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+  { color: '#34C759', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+  { color: '#FF3B30', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+  { color: '#FF9500', gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
+  { color: '#5856D6', gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
+  { color: '#FF2D55', gradient: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)' },
+  { color: '#AF52DE', gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
+  { color: '#00C7BE', gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)' },
+  { color: '#1DA1F2', gradient: 'linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)' },
+  { color: '#E91E63', gradient: 'linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%)' },
+];
+
 export const mockArticles: Article[] = [
   {
     id: '1',
@@ -21,6 +34,8 @@ export const mockArticles: Article[] = [
     percentageChange: getRandomChange(),
     sector: 'Technology',
     timestamp: new Date(Date.now() - 1000 * 60 * 15),
+    imageUrl: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&q=80',
+    imageColor: companyImages[0].color,
   },
   {
     id: '2',
@@ -33,6 +48,8 @@ export const mockArticles: Article[] = [
     percentageChange: getRandomChange(),
     sector: 'Banking',
     timestamp: new Date(Date.now() - 1000 * 60 * 45),
+    imageUrl: 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=800&q=80',
+    imageColor: companyImages[1].color,
   },
   {
     id: '3',
@@ -45,6 +62,8 @@ export const mockArticles: Article[] = [
     percentageChange: getRandomChange(),
     sector: 'Technology',
     timestamp: new Date(Date.now() - 1000 * 60 * 90),
+    imageUrl: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&q=80',
+    imageColor: companyImages[2].color,
   },
   {
     id: '4',
@@ -57,6 +76,8 @@ export const mockArticles: Article[] = [
     percentageChange: getRandomChange(),
     sector: 'Energy',
     timestamp: new Date(Date.now() - 1000 * 60 * 120),
+    imageUrl: 'https://images.unsplash.com/photo-1578663899664-27d2a5b4d64a?w=800&q=80',
+    imageColor: companyImages[3].color,
   },
   {
     id: '5',
@@ -69,6 +90,8 @@ export const mockArticles: Article[] = [
     percentageChange: getRandomChange(),
     sector: 'Healthcare',
     timestamp: new Date(Date.now() - 1000 * 60 * 180),
+    imageUrl: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=800&q=80',
+    imageColor: companyImages[4].color,
   },
   {
     id: '6',
@@ -81,6 +104,8 @@ export const mockArticles: Article[] = [
     percentageChange: getRandomChange(),
     sector: 'Technology',
     timestamp: new Date(Date.now() - 1000 * 60 * 240),
+    imageUrl: 'https://images.unsplash.com/photo-1523474253046-8cd2748b5fd2?w=800&q=80',
+    imageColor: companyImages[5].color,
   },
   {
     id: '7',
@@ -93,6 +118,8 @@ export const mockArticles: Article[] = [
     percentageChange: getRandomChange(),
     sector: 'Consumer',
     timestamp: new Date(Date.now() - 1000 * 60 * 300),
+    imageUrl: 'https://images.unsplash.com/photo-1554866585-cd94860890b7?w=800&q=80',
+    imageColor: companyImages[6].color,
   },
   {
     id: '8',
@@ -105,6 +132,8 @@ export const mockArticles: Article[] = [
     percentageChange: getRandomChange(),
     sector: 'Technology',
     timestamp: new Date(Date.now() - 1000 * 60 * 360),
+    imageUrl: 'https://images.unsplash.com/photo-1633419461186-7d40a38105ec?w=800&q=80',
+    imageColor: companyImages[7].color,
   },
   {
     id: '9',
@@ -117,6 +146,8 @@ export const mockArticles: Article[] = [
     percentageChange: getRandomChange(),
     sector: 'Banking',
     timestamp: new Date(Date.now() - 1000 * 60 * 420),
+    imageUrl: 'https://images.unsplash.com/photo-1560221328-12fe60f83ab8?w=800&q=80',
+    imageColor: companyImages[8].color,
   },
   {
     id: '10',
@@ -129,6 +160,8 @@ export const mockArticles: Article[] = [
     percentageChange: getRandomChange(),
     sector: 'Manufacturing',
     timestamp: new Date(Date.now() - 1000 * 60 * 480),
+    imageUrl: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80',
+    imageColor: companyImages[9].color,
   },
 ];
 
