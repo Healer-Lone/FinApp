@@ -41,6 +41,10 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "supabaseUrl": "https://nscfzwezqfeqmiinhinq.supabase.co",
+      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zY2Z6d2V6cWZlcW1paW5oaW5xIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTM5NTE1NCwiZXhwIjoyMDc0OTcxMTU0fQ.eMn9Eo3Aq7F6rkyOVtxjkUziHKw0JeTCbU-6Gm7wRA4"
     }
   }
 }
