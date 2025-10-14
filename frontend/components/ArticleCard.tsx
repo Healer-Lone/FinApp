@@ -163,8 +163,6 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBook
         <View style={[styles.stockBanner, { backgroundColor: colors.cardBg }]}>
           <Text style={[styles.stockSymbol, { color: colors.primary }]}>{article.stockSymbol}</Text>
           <View style={[styles.priceDivider, { backgroundColor: colors.border }]} />
-          <Text style={[styles.stockPrice, { color: colors.text }]}>${article.currentPrice.toFixed(2)}</Text>
-          <View style={[styles.priceDivider, { backgroundColor: colors.border }]} />
           <View style={[styles.sectorTag, { backgroundColor: colors.accent }]}>
             <Text style={styles.sectorText}>{article.sector}</Text>
           </View>
