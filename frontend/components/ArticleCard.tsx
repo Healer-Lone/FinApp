@@ -27,9 +27,6 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBook
   const [showMenu, setShowMenu] = useState(false);
   const { width, height } = useWindowDimensions();
   
-  const priceChangeColor = article.priceChange >= 0 ? colors.success : colors.error;
-  const priceChangeIcon = article.priceChange >= 0 ? 'trending-up' : 'trending-down';
-
   // Responsive height calculation - match tab bar height from _layout.tsx
   const tabBarHeight = Platform.OS === 'ios' ? 85 : 65;
   const cardHeight = height - tabBarHeight;
