@@ -4,13 +4,16 @@ export interface Article {
   headline: string;
   summary: string;
   stockSymbol: string;
-  currentPrice: number;
-  priceChange: number;
-  percentageChange: number;
+  currentPrice?: number;
+  priceChange?: number;
+  percentageChange?: number;
   sector: string;
   timestamp: Date;
   imageUrl: string;
   imageColor: string;
+  // New fields from Supabase
+  nifty50?: string;
+  bse200?: string;
 }
 
-export type Category = 'All' | 'Technology' | 'Banking' | 'Energy' | 'Healthcare' | 'Consumer' | 'Manufacturing';
+export type Category = 'All' | 'Technology' | 'Banking' | 'Energy' | 'Healthcare' | 'Consumer' | 'Manufacturing' | 'IT Sector';
