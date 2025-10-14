@@ -83,8 +83,6 @@ export default function HomeScreen() {
   );
 }
 
-const { height } = require('react-native').Dimensions.get('window');
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
