@@ -302,10 +302,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: 0.5,
   },
-  stockPrice: {
-    fontSize: 13,
-    fontWeight: '700',
-  },
   priceDivider: {
     width: 1,
     height: 14,
