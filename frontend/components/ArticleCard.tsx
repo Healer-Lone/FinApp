@@ -30,8 +30,9 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBook
   const priceChangeColor = article.priceChange >= 0 ? colors.success : colors.error;
   const priceChangeIcon = article.priceChange >= 0 ? 'trending-up' : 'trending-down';
 
-  // Responsive height calculation
-  const cardHeight = height - (Platform.OS === 'ios' ? 105 : 85);
+  // Responsive height calculation - match tab bar height from _layout.tsx
+  const tabBarHeight = Platform.OS === 'ios' ? 85 : 65;
+  const cardHeight = height - tabBarHeight;
   const imageHeight = Math.min(height * 0.28, 240); // 28% of screen or max 240px
 
   const handleShare = async () => {
