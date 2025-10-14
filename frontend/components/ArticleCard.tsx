@@ -322,6 +322,7 @@ const styles = StyleSheet.create({
   },
   textContent: {
     flex: 1,
+    overflow: 'hidden',
   },
   headline: {
     fontSize: 19,
