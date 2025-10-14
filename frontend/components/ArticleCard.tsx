@@ -173,11 +173,6 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBook
           <Text style={[styles.headline, { color: colors.text }]}>{article.headline}</Text>
           <Text style={[styles.summary, { color: colors.textSecondary }]}>{article.summary}</Text>
         </View>
-
-        {/* Swipe Indicator */}
-        <View style={styles.swipeIndicator}>
-          <Ionicons name="chevron-down" size={16} color={colors.textSecondary} />
-        </View>
       </View>
     </View>
   );
