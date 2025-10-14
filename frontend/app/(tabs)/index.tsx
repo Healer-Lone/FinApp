@@ -70,7 +70,6 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         decelerationRate="fast"
         snapToAlignment="start"
-        snapToInterval={height - (Platform.OS === 'ios' ? 105 : 85)}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
