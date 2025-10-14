@@ -7,18 +7,23 @@ import {
   StatusBar,
   Platform,
   BackHandler,
+  Text,
+  ActivityIndicator,
+  Animated,
 } from 'react-native';
 import ArticleCard from '../../components/ArticleCard';
-import { mockArticles } from '../../utils/mockData';
 import { useBookmarks } from '../../contexts/BookmarkContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useSupabase } from '../../contexts/SupabaseContext';
 import * as Haptics from 'expo-haptics';
 
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const { addBookmark, removeBookmark, isBookmarked } = useBookmarks();
   const { colors, isDarkMode } = useTheme();
+  const { documents, loading, error, refreshDocuments } = useSupabase();
   const flatListRef = useRef<FlatList>(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   // Handle Android back button
   useEffect(() => {
@@ -30,15 +35,25 @@ export default function HomeScreen() {
     return () => backHandler.remove();
   }, []);
 
+  // Fade in animation when data loads
+  useEffect(() => {
+    if (!loading && documents.length > 0) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [loading, documents]);
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     if (Platform.OS !== 'web') {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1500);
-  }, []);
+    await refreshDocuments();
+    setRefreshing(false);
+  }, [refreshDocuments]);
 
   const handleBookmarkToggle = (article: any) => {
     if (isBookmarked(article.id)) {
@@ -48,8 +63,57 @@ export default function HomeScreen() {
     }
   };
 
+  // Loading state
+  if (loading && documents.length === 0) {
+    return (
+      <View style={[styles.container, styles.centerContent, { backgroundColor: colors.background }]}>
+        <StatusBar 
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'} 
+          backgroundColor={colors.background} 
+        />
+        <ActivityIndicator size="large" color={colors.accent} />
+        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
+          Loading feed...
+        </Text>
+      </View>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <View style={[styles.container, styles.centerContent, { backgroundColor: colors.background }]}>
+        <StatusBar 
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'} 
+          backgroundColor={colors.background} 
+        />
+        <Text style={[styles.errorText, { color: colors.error }]}>
+          {error}
+        </Text>
+        <Text style={[styles.errorSubtext, { color: colors.textSecondary }]}>
+          Pull down to retry
+        </Text>
+      </View>
+    );
+  }
+
+  // Empty state
+  if (documents.length === 0) {
+    return (
+      <View style={[styles.container, styles.centerContent, { backgroundColor: colors.background }]}>
+        <StatusBar 
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'} 
+          backgroundColor={colors.background} 
+        />
+        <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+          No documents yet. New items will appear here automatically!
+        </Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <Animated.View style={[styles.container, { backgroundColor: colors.background, opacity: fadeAnim }]}>
       <StatusBar 
         barStyle={isDarkMode ? 'light-content' : 'dark-content'} 
         backgroundColor={colors.background} 
@@ -57,7 +121,7 @@ export default function HomeScreen() {
 
       <FlatList
         ref={flatListRef}
-        data={mockArticles}
+        data={documents}
         renderItem={({ item }) => (
           <ArticleCard
             article={item}
@@ -79,7 +143,7 @@ export default function HomeScreen() {
           />
         }
       />
-    </View>
+    </Animated.View>
   );
 }
 
