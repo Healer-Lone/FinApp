@@ -39,7 +39,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBook
     }
     
     try {
-      const message = `${article.headline}\n\n${article.summary}\n\n${article.stockSymbol}: $${article.currentPrice} (${article.priceChange >= 0 ? '+' : ''}${article.percentageChange}%)`;
+      const message = `${article.headline}\n\n${article.summary}\n\n${article.stockSymbol} - ${article.sector}`;
       
       if (Platform.OS === 'web') {
         if (navigator.share) {
