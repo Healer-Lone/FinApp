@@ -100,13 +100,21 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, isBookmarked, onBook
           <Text style={styles.companyNameOnImage}>{article.company}</Text>
         </View>
 
-        {/* Price indicator on image */}
-        <View style={[styles.priceIndicator, { backgroundColor: priceChangeColor + '20', borderColor: priceChangeColor }]}>
-          <Ionicons name={priceChangeIcon} size={16} color={priceChangeColor} />
-          <Text style={[styles.priceText, { color: priceChangeColor }]}>
-            {article.priceChange >= 0 ? '+' : ''}{article.percentageChange.toFixed(2)}%
-          </Text>
-        </View>
+        {/* Market badges on image */}
+        {(article.nifty50 === 'Yes' || article.bse200 === 'Yes') && (
+          <View style={styles.marketBadges}>
+            {article.nifty50 === 'Yes' && (
+              <View style={[styles.marketBadge, { backgroundColor: colors.success }]}>
+                <Text style={styles.marketBadgeText}>NIFTY 50</Text>
+              </View>
+            )}
+            {article.bse200 === 'Yes' && (
+              <View style={[styles.marketBadge, { backgroundColor: colors.primary }]}>
+                <Text style={styles.marketBadgeText}>BSE 200</Text>
+              </View>
+            )}
+          </View>
+        )}
       </View>
 
       {/* Menu Modal */}
