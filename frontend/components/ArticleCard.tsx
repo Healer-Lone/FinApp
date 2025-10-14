@@ -237,21 +237,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
   },
-  priceIndicator: {
+  marketBadges: {
     position: 'absolute',
     bottom: 12,
     right: 16,
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 16,
-    gap: 4,
-    borderWidth: 1.5,
+    gap: 6,
   },
-  priceText: {
-    fontSize: 13,
+  marketBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  marketBadgeText: {
+    color: '#ffffff',
+    fontSize: 10,
     fontWeight: '700',
+    letterSpacing: 0.3,
   },
   modalOverlay: {
     flex: 1,
