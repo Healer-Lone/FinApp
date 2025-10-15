@@ -111,11 +111,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "low"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: true
           agent: "main"
           comment: "Backend unchanged; verify /api root and /api/status work."
+        - working: true
+          agent: "testing"
+          comment: "All backend API tests PASSED: Health endpoint (GET /api/) returns correct message, Status creation (POST /api/status) works with proper validation, Status listing (GET /api/status) returns array with created items. Fixed minor .env parsing issue during testing. All endpoints responding correctly via external URL."
 
 frontend:
   - task: "Fix Flutter theme compile error (CardThemeData -> CardTheme)"
