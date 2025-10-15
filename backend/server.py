@@ -14,10 +14,15 @@ from datetime import datetime
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+# Debug environment variables
+print(f"Available env vars: {list(os.environ.keys())}")
+print(f"MONGO_URL: {os.environ.get('MONGO_URL', 'NOT FOUND')}")
+print(f"DB_NAME: {os.environ.get('DB_NAME', 'NOT FOUND')}")
+
 # MongoDB connection
-mongo_url = os.environ['MONGO_URL']
+mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db = client[os.environ.get('DB_NAME', 'test_database')]
 
 # Create the main app without a prefix
 app = FastAPI()
