@@ -157,15 +157,26 @@ frontend:
           agent: "main"
           comment: "Now tolerates alternative field names and safe defaults to prevent UI crashes."
 
+  - task: "Swap Supabase key to anon key in client"
+    implemented: true
+    working: true
+    file: "/app/frontend/lib/config/constants.dart"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Replaced service_role key with provided anon key. Updated .env for clarity (Expo not used in Flutter, but kept aligned)."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Backend /api health"
     - "App boots without theme errors"
     - "Supabase list fetch works or shows friendly error"
     - "Realtime insert/update/delete reflected"
@@ -178,3 +189,5 @@ agent_communication:
     message: "Implemented critical fixes for Supabase and compile error. Please test backend health first; then I can run automated frontend checks if approved by user."
   - agent: "testing"
     message: "Backend testing completed successfully. All FastAPI endpoints working correctly: GET /api/ returns Hello World, POST /api/status creates status checks with proper validation, GET /api/status lists all status checks. Fixed minor .env parsing issue during testing. Backend is stable and ready for production use."
+  - agent: "main"
+    message: "Swapped Supabase key to anon; ready for UI verification."
