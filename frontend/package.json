@@ -41,6 +41,13 @@
     "react-test-renderer": "18.2.0",
     "typescript": "~5.9.2"
   },
+  "resolutions": {
+    "metro": "0.80.9",
+    "metro-config": "0.80.9",
+    "metro-core": "0.80.9",
+    "metro-runtime": "0.80.9",
+    "metro-transform-worker": "0.80.9"
+  },
   "jest": {
     "preset": "react-native",
     "setupFilesAfterEnv": ["@testing-library/jest-native/extend-expect"],
