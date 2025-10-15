@@ -28,7 +28,7 @@ class AppTheme {
       secondary: lightAccent,
       surface: lightCardBg,
     ),
-    appBarTheme = const AppBarTheme(
+    appBarTheme: const AppBarTheme(
       backgroundColor: lightBackground,
       foregroundColor: lightText,
       elevation: 0,

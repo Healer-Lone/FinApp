@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/article.dart';
@@ -44,8 +45,6 @@ class SupabaseProvider with ChangeNotifier {
       }
     } on PostgrestException catch (e) {
       _error = e.message ?? 'Supabase query failed';
-    } on RealtimeError catch (e) {
-      _error = e.message;
     } on TimeoutException {
       _error = 'Request timed out. Please check your connection and try again.';
     } catch (e) {
