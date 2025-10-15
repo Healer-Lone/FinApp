@@ -142,11 +142,14 @@ frontend:
     file: "/app/frontend/lib/providers/supabase_provider.dart"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: true
           agent: "main"
           comment: "Added timeout, detailed error handling, update/delete realtime handlers, and duplicate subscription guard."
+        - working: true
+          agent: "testing"
+          comment: "VERIFIED: Robust Supabase implementation with 12-second timeout, comprehensive error handling for PostgrestException and TimeoutException, realtime subscription with insert/update/delete handlers, and proper channel deduplication via unsubscribe before new subscription."
 
   - task: "Robust Article model parsing for flexible schema"
     implemented: true
@@ -154,11 +157,14 @@ frontend:
     file: "/app/frontend/lib/models/article.dart"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: true
           agent: "main"
           comment: "Now tolerates alternative field names and safe defaults to prevent UI crashes."
+        - working: true
+          agent: "testing"
+          comment: "VERIFIED: Article model handles flexible schema with multiple field name variants (created_at/published_at/timestamp, image_url/imageUrl/cover, etc.), provides safe defaults for all fields, and includes fallback image URL to prevent widget crashes."
 
   - task: "Swap Supabase key to anon key in client"
     implemented: true
@@ -166,11 +172,14 @@ frontend:
     file: "/app/frontend/lib/config/constants.dart"
     stuck_count: 0
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: true
           agent: "main"
           comment: "Replaced service_role key with provided anon key. Updated .env for clarity (Expo not used in Flutter, but kept aligned)."
+        - working: true
+          agent: "testing"
+          comment: "VERIFIED: Anon key properly configured in constants.dart with correct Supabase URL. Key matches the one in .env file and is safe for client-side usage. No service_role key exposure detected."
 
 metadata:
   created_by: "main_agent"
