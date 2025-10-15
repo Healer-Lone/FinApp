@@ -127,11 +127,14 @@ frontend:
     file: "/app/frontend/lib/config/theme.dart"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: true
           agent: "main"
           comment: "Replaced invalid CardThemeData with CardTheme and ensured non-const BorderRadius usage."
+        - working: true
+          agent: "testing"
+          comment: "VERIFIED: CardTheme properly implemented in both light and dark themes with correct BorderRadius.circular(12) usage. No compile errors detected in theme configuration."
 
   - task: "Harden Supabase fetching and realtime (timeouts, error messages, deduped channel)"
     implemented: true
