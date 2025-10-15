@@ -53,14 +53,13 @@ class AppTheme {
       primary: darkPrimary,
       secondary: darkAccent,
       surface: darkCardBg,
-      background: darkBackground,
     ),
     appBarTheme: const AppBarTheme(
       backgroundColor: darkBackground,
       foregroundColor: darkText,
       elevation: 0,
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: darkCardBg,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
