@@ -4,6 +4,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/article.dart';
 
 class SupabaseProvider with ChangeNotifier {
+  final SupabaseClient _client;
+
   List<Article> _documents = [];
   bool _loading = true;
   String? _error;
@@ -13,7 +15,7 @@ class SupabaseProvider with ChangeNotifier {
   bool get loading => _loading;
   String? get error => _error;
 
-  SupabaseProvider() {
+  SupabaseProvider({SupabaseClient? client}) : _client = client ?? Supabase.instance.client {
     _initializeData();
   }
 
@@ -31,7 +33,7 @@ class SupabaseProvider with ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      final data = await Supabase.instance.client
+      final data = await _client
           .from('documents')
           .select()
           .order('created_at', ascending: false)
@@ -57,10 +59,9 @@ class SupabaseProvider with ChangeNotifier {
 
   void _setupRealtimeSubscription() {
     try {
-      // Avoid duplicate subscriptions
       _channel?.unsubscribe();
 
-      _channel = Supabase.instance.client
+      _channel = _client
           .channel('public:documents')
           .onPostgresChanges(
             event: PostgresChangeEvent.insert,
@@ -71,9 +72,7 @@ class SupabaseProvider with ChangeNotifier {
                 final newDoc = Article.fromJson(payload.newRecord);
                 _documents.insert(0, newDoc);
                 notifyListeners();
-              } catch (_) {
-                // ignore parsing issues for realtime payloads
-              }
+              } catch (_) {}
             },
           )
           .onPostgresChanges(
