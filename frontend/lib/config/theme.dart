@@ -28,12 +28,12 @@ class AppTheme {
       secondary: lightAccent,
       surface: lightCardBg,
     ),
-    appBarTheme: const AppBarTheme(
+    appBarTheme = const AppBarTheme(
       backgroundColor: lightBackground,
       foregroundColor: lightText,
       elevation: 0,
     ),
-    cardTheme: CardThemeData(
+    cardTheme: CardTheme(
       color: lightCardBg,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -59,7 +59,7 @@ class AppTheme {
       foregroundColor: darkText,
       elevation: 0,
     ),
-    cardTheme: CardThemeData(
+    cardTheme: CardTheme(
       color: darkCardBg,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

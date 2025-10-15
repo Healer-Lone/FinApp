@@ -26,21 +26,24 @@ class Article {
   });
 
   factory Article.fromJson(Map<String, dynamic> json) {
+    // Handle variant field names safely
+    final createdAt = json['created_at'] ?? json['published_at'] ?? json['timestamp'];
+    String? image = json['image_url'] ?? json['imageUrl'] ?? json['cover'];
+    // Ensure non-null, non-empty image to avoid widget crashes
+    image ??= 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&q=80';
+
     return Article(
-      id: json['id']?.toString() ?? '',
-      company: json['symbol'] ?? json['title']?.split(' ')[0] ?? 'Unknown',
-      headline: json['title'] ?? '',
-      summary: json['content'] ?? '',
-      stockSymbol: json['symbol'] ?? '',
-      sector: json['sector'] ?? 'General',
-      timestamp: json['created_at'] != null 
-          ? DateTime.parse(json['created_at']) 
-          : DateTime.now(),
-      imageUrl: json['image_url'] ?? 
-          'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&q=80',
+      id: (json['id'] ?? json['uuid'] ?? json['doc_id'] ?? '').toString(),
+      company: (json['symbol'] ?? json['company'] ?? (json['title'] is String ? (json['title'] as String).split(' ').first : 'Unknown')).toString(),
+      headline: (json['title'] ?? json['headline'] ?? json['name'] ?? '').toString(),
+      summary: (json['content'] ?? json['summary'] ?? json['description'] ?? '').toString(),
+      stockSymbol: (json['symbol'] ?? json['ticker'] ?? '').toString(),
+      sector: (json['sector'] ?? json['category'] ?? 'General').toString(),
+      timestamp: createdAt != null ? DateTime.tryParse(createdAt.toString()) ?? DateTime.now() : DateTime.now(),
+      imageUrl: image,
       imageColor: '#007AFF',
-      nifty50: json['nifty50'],
-      bse200: json['BSE200'],
+      nifty50: json['nifty50'] is bool ? json['nifty50'] as bool : null,
+      bse200: json['BSE200'] is bool ? json['BSE200'] as bool : (json['bse200'] is bool ? json['bse200'] as bool : null),
     );
   }
 

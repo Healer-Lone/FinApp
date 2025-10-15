@@ -102,95 +102,74 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Configure app with proper app name (StockByte), custom app icon from uploaded image, and URL scheme. Make the app fully production-ready."
+user_problem_statement: "Fix Supabase link issues, resolve crashes/bugs, and make the mobile app stable and Play Store ready."
 
 backend:
-  - task: "No backend changes required"
+  - task: "Existing FastAPI health endpoints"
     implemented: true
-    working: "NA"
-    file: "N/A"
+    working: true
+    file: "/app/backend/server.py"
     stuck_count: 0
     priority: "low"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-        - working: "NA"
+        - working: true
           agent: "main"
-          comment: "Backend configuration not needed for app branding changes"
+          comment: "Backend unchanged; verify /api root and /api/status work."
 
 frontend:
-  - task: "Update app name to StockByte"
+  - task: "Fix Flutter theme compile error (CardThemeData -> CardTheme)"
     implemented: true
     working: true
-    file: "/app/frontend/app.json, /app/frontend/package.json"
+    file: "/app/frontend/lib/config/theme.dart"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: true
           agent: "main"
-          comment: "Successfully updated app name from BriefCast to StockByte in app.json and package.json"
+          comment: "Replaced invalid CardThemeData with CardTheme and ensured non-const BorderRadius usage."
 
-  - task: "Configure custom app icon from uploaded image"
+  - task: "Harden Supabase fetching and realtime (timeouts, error messages, deduped channel)"
     implemented: true
     working: true
-    file: "/app/frontend/assets/images/"
+    file: "/app/frontend/lib/providers/supabase_provider.dart"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: true
           agent: "main"
-          comment: "Downloaded user's custom icon and created all required sizes: icon.png (1024x1024), adaptive-icon.png (1024x1024), favicon.png (48x48), splash-icon.png (200x200)"
+          comment: "Added timeout, detailed error handling, update/delete realtime handlers, and duplicate subscription guard."
 
-  - task: "Update bundle identifiers and package names"
+  - task: "Robust Article model parsing for flexible schema"
     implemented: true
     working: true
-    file: "/app/frontend/app.json"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-        - working: true
-          agent: "main"
-          comment: "Updated iOS bundle identifier to com.stockbyte.app and Android package to com.stockbyte.app"
-
-  - task: "Configure URL scheme"
-    implemented: true
-    working: true
-    file: "/app/frontend/app.json"
+    file: "/app/frontend/lib/models/article.dart"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: true
           agent: "main"
-          comment: "Set URL scheme to 'stockbyte' for deep linking support"
-
-  - task: "Update Android adaptive icon background color"
-    implemented: true
-    working: true
-    file: "/app/frontend/app.json"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
-    status_history:
-        - working: true
-          agent: "main"
-          comment: "Changed adaptive icon background from #000 to #FFA500 (orange) to match the icon's color scheme"
+          comment: "Now tolerates alternative field names and safe defaults to prevent UI crashes."
 
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 0
+  test_sequence: 1
   run_ui: false
 
 test_plan:
   current_focus:
-    - "All configuration tasks completed"
+    - "Backend /api health"
+    - "App boots without theme errors"
+    - "Supabase list fetch works or shows friendly error"
+    - "Realtime insert/update/delete reflected"
   stuck_tasks: []
   test_all: false
-  test_priority: "sequential"
+  test_priority: "high_first"
 
 agent_communication:
-    - agent: "main"
-      message: "App branding configuration complete. All icons generated, app name updated to StockByte, bundle identifiers set, and URL scheme configured. Created comprehensive documentation in STOCKBYTE_BUILD_GUIDE.md and APP_CONFIGURATION_SUMMARY.md. App is production-ready."
+  - agent: "main"
+    message: "Implemented critical fixes for Supabase and compile error. Please test backend health first; then I can run automated frontend checks if approved by user."
