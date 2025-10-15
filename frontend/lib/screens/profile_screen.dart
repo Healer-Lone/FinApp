@@ -317,7 +317,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onChanged: (value) {
                           themeProvider.toggleTheme();
                         },
-                        activeColor: const Color(0xFFFF9500),
+                        activeTrackColor: const Color(0xFFFF9500),
                       ),
                     ),
                   ),
